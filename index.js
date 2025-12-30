@@ -83,6 +83,7 @@ server.use(
     saveUninitialized: false, // don't create session until something stored
   })
 );
+server.use(passport.initialize());
 server.use(passport.authenticate('session'));
 server.use(
   cors({
@@ -91,14 +92,14 @@ server.use(
 );
 server.use(express.json()); // to parse req.body
 
-server.use('/products', isAuth(), productsRouter.router);
+server.use('/products', isAuth, productsRouter.router);
 // we can also use JWT token for client-only auth
-server.use('/categories', isAuth(), categoriesRouter.router);
-server.use('/brands', isAuth(), brandsRouter.router);
-server.use('/users', isAuth(), usersRouter.router);
+server.use('/categories', isAuth, categoriesRouter.router);
+server.use('/brands', isAuth, brandsRouter.router);
+server.use('/users', isAuth, usersRouter.router);
 server.use('/auth', authRouter.router);
-server.use('/cart', isAuth(), cartRouter.router);
-server.use('/orders', isAuth(), ordersRouter.router);
+server.use('/cart', isAuth, cartRouter.router);
+server.use('/orders', isAuth, ordersRouter.router);
 
 // this line we add to make react router work in case of other routes doesnt match
 server.get('*', (req, res) =>
