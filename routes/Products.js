@@ -1,13 +1,14 @@
 const express = require('express');
 const { createProduct, fetchAllProducts, fetchProductById, updateProduct } = require('../controller/Product');
 const { Product } = require('../model/Product');
+const { isAuth } = require('../services/common');
 
 const router = express.Router();
 //  /products is already added in base path
-router.post('/', createProduct)
-      .get('/', fetchAllProducts)
+router.get('/', fetchAllProducts)
       .get('/:id', fetchProductById)
-      .patch('/:id', updateProduct)
+      .post('/', isAuth(), createProduct)
+      .patch('/:id', isAuth(), updateProduct)
       // .get('/update/test',async(req,res)=>{
       //       // For adding discountPrice to existing data : delete this code after use
       //      const products = await Product.find({});
