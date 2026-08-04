@@ -26,7 +26,13 @@ const { Order } = require('./model/Order');
 const { env } = require('process');
 
 // Validate Required Environment Variables
-const requiredEnvVars = ['MONGODB_URL', 'JWT_SECRET_KEY', 'SESSION_KEY'];
+const requiredEnvVars = [
+  'MONGODB_URL',
+  'JWT_SECRET_KEY',
+  'SESSION_KEY',
+  'ADMIN_EMAIL',
+  'ADMIN_PASSWORD'
+];
 const missingEnvVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
@@ -221,9 +227,49 @@ server.post('/create-payment-intent', async (req, res) => {
 
 main().catch((err) => console.log(err));
 
+async function initializeAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminEmail && adminPassword) {
+    try {
+      let adminUser = await User.findOne({ email: adminEmail });
+      const salt = crypto.randomBytes(16);
+      const hashedPassword = crypto.pbkdf2Sync(
+        adminPassword,
+        salt,
+        310000,
+        32,
+        'sha256'
+      );
+
+      if (adminUser) {
+        adminUser.password = hashedPassword;
+        adminUser.salt = salt;
+        adminUser.role = 'admin';
+        await adminUser.save();
+        console.log(`Admin user (${adminEmail}) updated successfully from environment variables.`);
+      } else {
+        adminUser = new User({
+          email: adminEmail,
+          password: hashedPassword,
+          salt: salt,
+          role: 'admin',
+          addresses: []
+        });
+        await adminUser.save();
+        console.log(`Admin user (${adminEmail}) created successfully from environment variables.`);
+      }
+    } catch (err) {
+      console.error('Error initializing admin user:', err);
+    }
+  }
+}
+
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
   console.log('database connected');
+  await initializeAdmin();
 }
 
 server.listen(process.env.PORT, () => {
