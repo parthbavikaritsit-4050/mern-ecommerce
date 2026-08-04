@@ -13,6 +13,7 @@
   "dependencies": {
     "connect-sqlite": "^0.0.1",
     "connect-sqlite3": "^0.9.13",
+    "sqlite3": "^5.1.7",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
