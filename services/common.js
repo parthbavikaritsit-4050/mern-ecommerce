@@ -16,6 +16,14 @@ exports.isAuth = (req, res, done) => {
   return passport.authenticate('jwt');
 };
 
+exports.isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ error: 'Access forbidden: Admins only' });
+  }
+};
+
 exports.sanitizeUser = (user) => {
   return { id: user.id, role: user.role };
 };

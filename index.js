@@ -104,7 +104,6 @@ const SQLiteStore = require('connect-sqlite3')(session);
 
 //middlewares
 
-server.use(express.static(path.resolve(__dirname, 'build')));
 server.use(cookieParser());
 server.use(
   session({
@@ -131,10 +130,10 @@ server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
 
-// this line we add to make react router work in case of other routes doesnt match
-server.get('*', (req, res) =>
-  res.sendFile(path.resolve('build', 'index.html'))
-);
+// 404 Route for unmatched backend routes (since frontend is removed)
+server.use('*', (req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
 
 // Passport Strategies
 passport.use(
@@ -231,52 +230,8 @@ server.post('/create-payment-intent', async (req, res) => {
   });
 });
 
-main().catch((err) => console.log(err));
-
-async function initializeAdmin() {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (adminEmail && adminPassword) {
-    try {
-      let adminUser = await User.findOne({ email: adminEmail });
-      const salt = crypto.randomBytes(16);
-      const hashedPassword = crypto.pbkdf2Sync(
-        adminPassword,
-        salt,
-        310000,
-        32,
-        'sha256'
-      );
-
-      if (adminUser) {
-        adminUser.password = hashedPassword;
-        adminUser.salt = salt;
-        adminUser.role = 'admin';
-        await adminUser.save();
-        console.log(`Admin user (${adminEmail}) updated successfully from environment variables.`);
-      } else {
-        adminUser = new User({
-          email: adminEmail,
-          password: hashedPassword,
-          salt: salt,
-          role: 'admin',
-          addresses: []
-        });
-        await adminUser.save();
-        console.log(`Admin user (${adminEmail}) created successfully from environment variables.`);
-      }
-    } catch (err) {
-      console.error('Error initializing admin user:', err);
-    }
-  }
-}
-
-async function main() {
-  await mongoose.connect(process.env.MONGODB_URL);
-  console.log('database connected');
-  await initializeAdmin();
-}
+const { connectDB } = require('./services/db');
+connectDB().catch((err) => console.log('Database initialization failed:', err.message));
 
 server.listen(process.env.PORT, () => {
   console.log('server started');

@@ -74,8 +74,8 @@ exports.fetchOrdersByUser = async (req, res) => {
     console.log({ totalDocs });
   
     if (req.query._page && req.query._limit) {
-      const pageSize = req.query._limit;
-      const page = req.query._page;
+      const pageSize = parseInt(req.query._limit, 10);
+      const page = parseInt(req.query._page, 10);
       query = query.skip(pageSize * (page - 1)).limit(pageSize);
     }
   
