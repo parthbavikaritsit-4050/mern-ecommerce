@@ -91,12 +91,18 @@ const opts = {};
 opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = process.env.JWT_SECRET_KEY; 
 
+// SQLite3 session store configuration
+const sqlite3 = require('sqlite3').verbose();
+const dbConnection = new sqlite3.Database('./sessions.db');
+const SQLiteStore = require('connect-sqlite3')(session);
+
 //middlewares
 
 server.use(express.static(path.resolve(__dirname, 'build')));
 server.use(cookieParser());
 server.use(
   session({
+    store: new SQLiteStore({ db: dbConnection }),
     secret: process.env.SESSION_KEY,
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
