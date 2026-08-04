@@ -56,6 +56,8 @@ Render allows you to securely specify environment variables. In the **Environmen
 | `MONGODB_URL` | Your MongoDB Atlas connection URI | `mongodb+srv://user:pass@cluster.mongodb.net/dbname` | **Yes** |
 | `JWT_SECRET_KEY` | A secret string used to sign JWTs | e.g. `some_long_random_jwt_secret_string` | **Yes** |
 | `SESSION_KEY` | A secret string used for express-session signing | e.g. `some_long_random_session_secret_string` | **Yes** |
+| `ADMIN_EMAIL` | The administrator's login email address | `admin@gmail.com` | **Yes** |
+| `ADMIN_PASSWORD` | The administrator's login password | `AdminSecretPassword123!` | **Yes** |
 | `STRIPE_SERVER_KEY`| Your Stripe Secret API Key | `sk_test_...` (Keep blank/dummy if unused) | No |
 | `ENDPOINT_SECRET` | Your Stripe Webhook Signing Secret | `whsec_...` (Keep blank/dummy if unused) | No |
 | `MAIL_PASSWORD` | App Password for Nodemailer GMail SMTP | Gmail App Password (NOT your login password) | No |
@@ -100,12 +102,12 @@ If the application crashes during deployment or you see an error like:
 TypeError: JwtStrategy requires a secret or key
 ```
 This means that the application failed to find the required environment variables.
-In this updated codebase, a graceful check is added to inspect if `MONGODB_URL`, `JWT_SECRET_KEY`, and `SESSION_KEY` are defined. If any of them are missing, the server will output a detailed and clean error message indicating exactly which variable(s) you forgot to specify in the Render Dashboard, and then gracefully exit with status 1.
+In this updated codebase, a graceful check is added to inspect if `MONGODB_URL`, `JWT_SECRET_KEY`, `SESSION_KEY`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` are defined. If any of them are missing, the server will output a detailed and clean error message indicating exactly which variable(s) you forgot to specify in the Render Dashboard, and then gracefully exit with status 1.
 
 **To fix this:**
 1. Navigate to your Web Service page in the **Render Dashboard**.
 2. Click on the **Environment** tab on the left-side menu.
-3. Verify that `MONGODB_URL`, `JWT_SECRET_KEY`, and `SESSION_KEY` are all listed in the table and have correct non-empty values.
+3. Verify that `MONGODB_URL`, `JWT_SECRET_KEY`, `SESSION_KEY`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` are all listed in the table and have correct non-empty values.
 4. Click **Save Changes** and trigger a **Manual Deploy** -> **Clear Build Cache & Deploy**.
 
 - **Database Connection fails**: Double check that your MongoDB cluster has **network access from anywhere (`0.0.0.0/0`)** enabled in the MongoDB Atlas Network Access settings, since Render's outward-facing IPs are dynamic.
