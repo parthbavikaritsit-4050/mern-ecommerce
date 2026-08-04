@@ -130,6 +130,11 @@ server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
 
+// Health check endpoint
+server.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), timestamp: new Date() });
+});
+
 // 404 Route for unmatched backend routes (since frontend is removed)
 server.use('*', (req, res) => {
   res.status(404).json({ error: 'Endpoint not found' });
