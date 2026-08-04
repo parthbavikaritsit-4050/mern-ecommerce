@@ -25,6 +25,25 @@ const path = require('path');
 const { Order } = require('./model/Order');
 const { env } = require('process');
 
+// Validate Required Environment Variables
+const requiredEnvVars = ['MONGODB_URL', 'JWT_SECRET_KEY', 'SESSION_KEY'];
+const missingEnvVars = requiredEnvVars.filter((varName) => !process.env[varName]);
+
+if (missingEnvVars.length > 0) {
+  console.error('\n========================================================================');
+  console.error('❌ CRITICAL CONFIGURATION ERROR: Missing Environment Variables');
+  console.error('========================================================================');
+  console.error(`The following required environment variable(s) are missing:\n`);
+  missingEnvVars.forEach((varName) => {
+    console.error(`   - ${varName}`);
+  });
+  console.error('\n👉 Action Required:');
+  console.error('   Please define these variables in your deployment environment (e.g. Render Dashboard).');
+  console.error('   Refer to RENDER_DEPLOYMENT.md for more detailed instructions.');
+  console.error('========================================================================\n');
+  process.exit(1);
+}
+
 // Webhook
 
 const endpointSecret = process.env.ENDPOINT_SECRET;
